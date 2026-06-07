@@ -23,6 +23,7 @@ return [
     'support' => 'support 24/7 time',
     'address' => 'Address',
     'phone' => 'Phone',
+    'amount'=> 'Amount',
     'email' => 'Email',
     'useful_links' => 'Useful Links',
     'about_us' => 'About Us',
