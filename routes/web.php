@@ -58,6 +58,7 @@ Route::middleware([
             Route::get('/admin/profits', [AdminController::class, 'profitsPage'])->name('admin.profits'); // View profits
 
             Route::get('/tickets', [AdminController::class, 'ticketsView'])->name('tickets.view');
+            Route::post('/tickets/{ticket}/reply', [TicketMessages::class, 'reply'])->name('tickets.reply');
 
             // تغيير حالة التذكرة (open, in_progress, closed)
             Route::post('/tickets/{ticket}/status', [AdminController::class, 'updateTicketStatus'])->name('tickets.status');
