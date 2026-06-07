@@ -35,7 +35,7 @@
                                             <div class="avatar me-3">
                                                 <span class="avatar-initial rounded bg-label-primary p-2 d-flex align-items-center justify-content-center"><i class="bx bx-user bx-sm text-primary"></i></span>
                                             </div>
-                                            <h4 class="mb-0">{{$all_users_number}}</h4>
+                                            <h4 class="mb-0">{{$all_users_number ?? 0}}</h4>
                                         </div>
                                         <p class="mb-1 text-muted">{{ __('messages.all_users') }}</p>
                                     </div>
@@ -49,7 +49,7 @@
                                             <div class="avatar me-3">
                                                 <span class="avatar-initial rounded bg-label-info p-2 d-flex align-items-center justify-content-center"><i class="bx bx-store bx-sm text-info"></i></span>
                                             </div>
-                                            <h4 class="mb-0">{{$owners_number}}</h4>
+                                            <h4 class="mb-0">{{$owners_number ?? 0}}</h4>
                                         </div>
                                         <p class="mb-1 text-muted">{{ __('messages.owners') }}</p>
                                     </div>
@@ -63,7 +63,7 @@
                                             <div class="avatar me-3">
                                                 <span class="avatar-initial rounded bg-label-warning p-2 d-flex align-items-center justify-content-center"><i class="bx bx-credit-card bx-sm text-warning"></i></span>
                                             </div>
-                                            <h4 class="mb-0">{{$payment_requests_number}}</h4>
+                                            <h4 class="mb-0">{{$payment_requests_number ?? 0}}</h4>
                                         </div>
                                         <p class="mb-1 text-muted">{{ __('messages.subscription_requests') }}</p>
                                     </div>
@@ -77,7 +77,7 @@
                                             <div class="avatar me-3">
                                                 <span class="avatar-initial rounded bg-label-success p-2 d-flex align-items-center justify-content-center"><i class="bx bx-dollar-circle bx-sm text-success"></i></span>
                                             </div>
-                                            <h4 class="mb-0">{{$total_commissions}} {{ __('messages.da') }}</h4>
+                                            <h4 class="mb-0">{{$total_commissions ?? 0}} {{ __('messages.da') }}</h4>
                                         </div>
                                         <p class="mb-1 text-muted">{{ __('messages.total_commissions') }}</p>
                                     </div>
@@ -91,10 +91,10 @@
                                 <h5 class="mb-0 text-warning fw-semibold">
                                     <i class="bx bx-error me-2"></i> {{ __('messages.subscription_expiry_alerts') }}
                                 </h5>
-                                <span class="badge bg-warning text-dark">{{ $expiring_stores->count() }}</span>
+                                <span class="badge bg-warning text-dark">{{ isset($expiring_stores) ? $expiring_stores->count() : 0 }}</span>
                             </div>
                             <div class="card-body pt-3">
-                                @if($expiring_stores->count() > 0)
+                                @if(isset($expiring_stores) && $expiring_stores->count() > 0)
                                     <div class="table-responsive">
                                         <table class="table table-hover align-middle">
                                             <thead>

@@ -42,7 +42,7 @@
                                                         </div>
                                                     </div>
                                                     <p class="mb-1">{{ __('messages.orders') }}</p>
-                                                    <h4 class="card-title mb-2">{{ $orders_number }}</h4>
+                                                    <h4 class="card-title mb-2">{{ $orders_number ?? 0 }}</h4>
                                                 </a>
 
                                             </div>
@@ -62,7 +62,7 @@
                                                         </div>
                                                     </div>
                                                     <p class="mb-1">{{ __('messages.products') }}</p>
-                                                    <h4 class="card-title mb-2">{{ $products_number }}</h4>
+                                                    <h4 class="card-title mb-2">{{ $products_number ?? 0 }}</h4>
                                                 </a>
 
                                             </div>
@@ -82,7 +82,7 @@
                                                         </div>
                                                     </div>
                                                     <p class="mb-1">{{ __('messages.customers') }}</p>
-                                                    <h4 class="card-title mb-2">{{ $customers_number }}</h4>
+                                                    <h4 class="card-title mb-2">{{ $customers_number ?? 0 }}</h4>
                                                 </a>
                                             </div>
                                         </div>
@@ -102,7 +102,7 @@
                                                     </div>
                                                     <p class="mb-1">{{ __('messages.revenue') }}</p>
                                                     <h4 class="card-title mb-2 " style="direction: ltr">
-                                                        {{ number_format($revenue, 2, ',', ' ') }}
+                                                        {{ number_format($revenue ?? 0, 2, ',', ' ') }}
                                                         {{ __('messages.da') }}</h4>
                                                 </a>
                                             </div>
@@ -188,9 +188,9 @@ const labelColor = '#a1b0cb';
 const headingColor = '#566a7f';
 
 // Data from controller
-const revenueTrend = @json($revenue_trend);
-const ordersTrend = @json($orders_trend);
-const topProducts = @json($top_products);
+const revenueTrend = @json($revenue_trend ?? []);
+const ordersTrend = @json($orders_trend ?? []);
+const topProducts = @json($top_products ?? []);
 
 // 1. Revenue Trend Line Chart
 const revOptions = {

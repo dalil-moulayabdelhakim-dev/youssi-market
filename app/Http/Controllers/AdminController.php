@@ -35,140 +35,143 @@ class AdminController extends Controller
             $cartCount = $user->cart()->count(); // يحسب العدد الإجمالي
 
             return match ((int) $user_type) {
-                1 => (function () use ($user) {
-                        $all_users_number = User::query()->where('id', '!=', $user->id)->count();
-                        $payment_requests_number = PaymentRequest::query()->where('status', 'pending')->count();
-                        $owners_number = User::where('user_type_id', 2)->count();
-                        $total_commissions = Commission::sum('amount') ?? 0;
-
-                        // 1) Trend line chart (last 30 days)
-                        $commissions_trend = Commission::select(
-                            DB::raw('DATE(created_at) as date'),
-                            DB::raw('SUM(amount) as total')
-                        )
-                            ->where('created_at', '>=', now()->subDays(30))
-                            ->groupBy('date')
-                            ->orderBy('date', 'asc')
-                            ->get();
-
-                        // 2) Top 5 stores by commission
-                        $top_stores = Commission::select('store_id', DB::raw('SUM(amount) as total_commission'))
-                            ->with('store:id,name')
-                            ->groupBy('store_id')
-                            ->orderBy('total_commission', 'desc')
-                            ->take(5)
-                            ->get()
-                            ->map(function ($item) {
-                                return [
-                                    'name' => optional($item->store)->name ?? __('messages.no_name'),
-                                    'total_commission' => (float)$item->total_commission
-                                ];
-                            });
-
-                        // 3) Category sales distribution
-                        $category_sales = OrderItem::join('products', 'order_items.product_id', '=', 'products.id')
-                            ->join('categories', 'products.category_id', '=', 'categories.id')
-                            ->select('categories.name', DB::raw('SUM(order_items.price * order_items.quantity) as total_sales'))
-                            ->groupBy('categories.id', 'categories.name')
-                            ->orderBy('total_sales', 'desc')
-                            ->get()
-                            ->map(function ($item) {
-                                return [
-                                    'name' => __('messages.' . $item->name) == 'messages.' . $item->name ? str_replace('_', ' ', $item->name) : __('messages.' . $item->name),
-                                    'total_sales' => (float)$item->total_sales
-                                ];
-                            });
-
-                        // 4) Expiring subscriptions in next 5 days
-                        $expiring_stores = Store::where(function($query) {
-                            $query->where('subscription_status', 'active')
-                                  ->whereBetween('subscription_ends_at', [now(), now()->addDays(5)]);
-                        })->orWhere(function($query) {
-                            $query->where('subscription_status', 'trial')
-                                  ->whereBetween('trial_ends_at', [now(), now()->addDays(5)]);
-                        })->with('users')->get();
-
-                        return view('admin.index', [
-                            'all_users_number' => $all_users_number,
-                            'payment_requests_number' => $payment_requests_number,
-                            'owners_number' => $owners_number,
-                            'total_commissions' => $total_commissions,
-                            'commissions_trend' => $commissions_trend,
-                            'top_stores' => $top_stores,
-                            'category_sales' => $category_sales,
-                            'expiring_stores' => $expiring_stores,
-                        ]);
-                    })(),
-
-                2 => (function () use ($storeId, $cartCount) {
-                        // 1) عدد الطلبات (Orders)
-                        $orders_number = Order::whereHas('orderItems.product', function ($query) use ($storeId) {
-                            $query->where('store_id', $storeId);
-                        })->count();
-
-                        // 2) عدد المنتجات (Products)
-                        $products_number = Product::where('store_id', $storeId)->count();
-
-                        // 3) عدد الزبائن (Customers)
-                        $customers_number = Order::whereHas('orderItems.product', function ($query) use ($storeId) {
-                            $query->where('store_id', $storeId);
-                        })->distinct('user_id')->count('user_id');
-
-                        // 4) مجموع الأرباح (Revenue)
-                        $revenue = OrderItem::whereHas('product', function ($query) use ($storeId) {
-                            $query->where('store_id', $storeId);
-                        })->sum(DB::raw('price * quantity'));
-
-                        // 5) Trend charts (last 30 days)
-                        $orders_trend = Order::select(
-                            DB::raw('DATE(created_at) as date'),
-                            DB::raw('COUNT(*) as total')
-                        )
-                            ->whereHas('orderItems.product', function ($query) use ($storeId) {
-                                $query->where('store_id', $storeId);
-                            })
-                            ->where('created_at', '>=', now()->subDays(30))
-                            ->groupBy('date')
-                            ->orderBy('date', 'asc')
-                            ->get();
-
-                        $revenue_trend = OrderItem::select(
-                            DB::raw('DATE(order_items.created_at) as date'),
-                            DB::raw('SUM(order_items.price * order_items.quantity) as total')
-                        )
-                            ->whereHas('product', function ($query) use ($storeId) {
-                                $query->where('store_id', $storeId);
-                            })
-                            ->where('order_items.created_at', '>=', now()->subDays(30))
-                            ->groupBy('date')
-                            ->orderBy('date', 'asc')
-                            ->get();
-
-                        // 6) Top 5 products by sales
-                        $top_products = OrderItem::join('products', 'order_items.product_id', '=', 'products.id')
-                            ->select('products.title', DB::raw('SUM(order_items.quantity) as total_sold'))
-                            ->where('products.store_id', $storeId)
-                            ->groupBy('products.id', 'products.title')
-                            ->orderBy('total_sold', 'desc')
-                            ->take(5)
-                            ->get();
-
-                        return view('owner.index', [
-                            'orders_number' => $orders_number,
-                            'products_number' => $products_number,
-                            'customers_number' => $customers_number,
-                            'revenue' => $revenue,
-                            'cartCount' => $cartCount,
-                            'orders_trend' => $orders_trend,
-                            'revenue_trend' => $revenue_trend,
-                            'top_products' => $top_products,
-                        ]);
-                    })(),
-
+                1 => $this->adminDashboard($user),
+                2 => $this->sellerDashboard($storeId, $cartCount),
                 default => redirect()->route('/'),
             };
-
         }
+    }
+
+    private function adminDashboard($user)
+    {
+        $all_users_number = User::query()->where('id', '!=', $user->id)->count();
+        $payment_requests_number = PaymentRequest::query()->where('status', 'pending')->count();
+        $owners_number = User::where('user_type_id', 2)->count();
+        $total_commissions = Commission::sum('amount') ?? 0;
+
+        // 1) Trend line chart (last 30 days)
+        $commissions_trend = Commission::select(
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('SUM(amount) as total')
+        )
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
+
+        // 2) Top 5 stores by commission
+        $top_stores = Commission::select('store_id', DB::raw('SUM(amount) as total_commission'))
+            ->with('store:id,name')
+            ->groupBy('store_id')
+            ->orderBy('total_commission', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => optional($item->store)->name ?? __('messages.no_name'),
+                    'total_commission' => (float)$item->total_commission
+                ];
+            });
+
+        // 3) Category sales distribution
+        $category_sales = OrderItem::join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->select('categories.name', DB::raw('SUM(order_items.price * order_items.quantity) as total_sales'))
+            ->groupBy('categories.id', 'categories.name')
+            ->orderBy('total_sales', 'desc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => __('messages.' . $item->name) == 'messages.' . $item->name ? str_replace('_', ' ', $item->name) : __('messages.' . $item->name),
+                    'total_sales' => (float)$item->total_sales
+                ];
+            });
+
+        // 4) Expiring subscriptions in next 5 days
+        $expiring_stores = Store::where(function($query) {
+            $query->where('subscription_status', 'active')
+                  ->whereBetween('subscription_ends_at', [now(), now()->addDays(5)]);
+        })->orWhere(function($query) {
+            $query->where('subscription_status', 'trial')
+                  ->whereBetween('trial_ends_at', [now(), now()->addDays(5)]);
+        })->with('users')->get();
+
+        return view('admin.index', [
+            'all_users_number' => $all_users_number,
+            'payment_requests_number' => $payment_requests_number,
+            'owners_number' => $owners_number,
+            'total_commissions' => $total_commissions,
+            'commissions_trend' => $commissions_trend,
+            'top_stores' => $top_stores,
+            'category_sales' => $category_sales,
+            'expiring_stores' => $expiring_stores,
+        ]);
+    }
+
+    private function sellerDashboard($storeId, $cartCount)
+    {
+        // 1) عدد الطلبات (Orders)
+        $orders_number = Order::whereHas('orderItems.product', function ($query) use ($storeId) {
+            $query->where('store_id', $storeId);
+        })->count();
+
+        // 2) عدد المنتجات (Products)
+        $products_number = Product::where('store_id', $storeId)->count();
+
+        // 3) عدد الزبائن (Customers)
+        $customers_number = Order::whereHas('orderItems.product', function ($query) use ($storeId) {
+            $query->where('store_id', $storeId);
+        })->distinct('user_id')->count('user_id');
+
+        // 4) مجموع الأرباح (Revenue)
+        $revenue = OrderItem::whereHas('product', function ($query) use ($storeId) {
+            $query->where('store_id', $storeId);
+        })->sum(DB::raw('price * quantity'));
+
+        // 5) Trend charts (last 30 days)
+        $orders_trend = Order::select(
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('COUNT(*) as total')
+        )
+            ->whereHas('orderItems.product', function ($query) use ($storeId) {
+                $query->where('store_id', $storeId);
+            })
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $revenue_trend = OrderItem::select(
+            DB::raw('DATE(order_items.created_at) as date'),
+            DB::raw('SUM(order_items.price * order_items.quantity) as total')
+        )
+            ->whereHas('product', function ($query) use ($storeId) {
+                $query->where('store_id', $storeId);
+            })
+            ->where('order_items.created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
+
+        // 6) Top 5 products by sales
+        $top_products = OrderItem::join('products', 'order_items.product_id', '=', 'products.id')
+            ->select('products.title', DB::raw('SUM(order_items.quantity) as total_sold'))
+            ->where('products.store_id', $storeId)
+            ->groupBy('products.id', 'products.title')
+            ->orderBy('total_sold', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('owner.index', [
+            'orders_number' => $orders_number,
+            'products_number' => $products_number,
+            'customers_number' => $customers_number,
+            'revenue' => $revenue,
+            'cartCount' => $cartCount,
+            'orders_trend' => $orders_trend,
+            'revenue_trend' => $revenue_trend,
+            'top_products' => $top_products,
+        ]);
     }
 
     public function subscriptionRequestView()
