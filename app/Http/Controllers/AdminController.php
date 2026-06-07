@@ -34,7 +34,7 @@ class AdminController extends Controller
 
             $cartCount = $user->cart()->count(); // يحسب العدد الإجمالي
 
-            return match ($user_type) {
+            return match ((int) $user_type) {
                 1 => (function () use ($user) {
                         $all_users_number = User::query()->where('id', '!=', $user->id)->count();
                         $payment_requests_number = PaymentRequest::query()->where('status', 'pending')->count();
@@ -165,7 +165,7 @@ class AdminController extends Controller
                         ]);
                     })(),
 
-                default => view('index'),
+                default => redirect()->route('/'),
             };
 
         }

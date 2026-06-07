@@ -94,6 +94,10 @@ public function commune()
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'user_type_id' => 'integer',
+            'store_id' => 'integer',
+            'wilaya_id' => 'integer',
+            'commune_id' => 'integer',
         ];
     }
 }
