@@ -15,10 +15,8 @@ class SubscriptionController extends Controller
     {
         $user = Auth::user();
         if ($user) {
-            $subscreptions = SubscriptionMethod::all();
-            $monthly = $subscreptions->where('name', 'monthly')->first() ?? $subscreptions->get(0);
-            $yearly = $subscreptions->where('name', 'yearly')->first() ?? $subscreptions->get(1);
-            return view('subscribe', compact('monthly', 'yearly'));
+            $plans = SubscriptionMethod::whereNotIn('name', ['lifetime', 'trial'])->get();
+            return view('subscribe', compact('plans'));
         }
 
         Session::flash('success', [__('messages.auth_required')]);
