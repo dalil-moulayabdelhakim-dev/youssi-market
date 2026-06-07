@@ -12,7 +12,7 @@
         <div class="row featured__filter" style="direction: {{ config('app.locale') === 'ar' ? 'rtl' : 'ltr' }}">
             @foreach($plans as $plan)
             <div class="col-md-6 mb-4">
-                <div class="card {{ $plan->name === 'yearly' ? 'border-success' : 'border-primary' }} h-100 shadow p-3 rounded-lg">
+                <div class="card {{ $plan->name === 'yearly' ? 'border-success' : ($plan->price == 0 ? 'border-info' : 'border-primary') }} h-100 shadow p-3 rounded-lg">
                     @if($plan->name === 'yearly')
                     <!-- وسم الأكثر شيوعًا -->
                     <div class="position-absolute top-0 start-50 translate-middle-x mt-1"
@@ -21,10 +21,18 @@
                             {{ __('messages.most_popular') }}
                         </span>
                     </div>
+                    @elseif($plan->price == 0)
+                    <!-- وسم عرض خاص -->
+                    <div class="position-absolute top-0 start-50 translate-middle-x mt-1"
+                        style="z-index: 1; margin-top: -15px; color: white">
+                        <span class="badge bg-info px-3 py-2 shadow-sm rounded-pill animate__animated animate__pulse animate__infinite">
+                            {{ __('messages.special_offer') }}
+                        </span>
+                    </div>
                     @endif
 
                     <div class="card-body text-center">
-                        <h5 class="card-title {{ $plan->name === 'yearly' ? 'text-success' : 'text-primary' }}">
+                        <h5 class="card-title {{ $plan->name === 'yearly' ? 'text-success' : ($plan->price == 0 ? 'text-info' : 'text-primary') }}">
                             @if(config('app.locale') === 'ar' && $plan->display_name_ar)
                                 {{ $plan->display_name_ar }}
                             @elseif($plan->display_name_en)

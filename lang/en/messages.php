@@ -150,6 +150,7 @@ return [
     'yearly_feature_3' => 'Priority support via phone',
     'subscribe_now' => 'Subscribe Now',
     'most_popular' => 'Most Popular',
+    'special_offer' => 'Special Offer!',
 
     'payment_guide' => 'Payment Instructions',
     'ccp_payment' => 'Payment via CCP (Post Office Account)',

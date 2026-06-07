@@ -150,6 +150,7 @@ return [
     'yearly_feature_3' => 'دعم أولوية عبر الهاتف',
     'subscribe_now' => 'اشترك الآن',
     'most_popular' => 'الأكثر شيوعًا',
+    'special_offer' => 'عرض خاص!',
     'payment_guide' => 'دليل الدفع',
     'ccp_payment' => 'الدفع عبر الحساب البريدي CCP',
     'ccp_number' => 'رقم الحساب',
