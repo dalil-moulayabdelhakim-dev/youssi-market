@@ -15,7 +15,7 @@ if ($providedToken !== $secretToken) {
     exit;
 }
 
-$zipFile = 'deploy.zip';
+$zipFile = '/home/youssi21/youssi-market.com/main/deploy.zip';
 
 if (!file_exists($zipFile)) {
     echo "Error: $zipFile not found.";
@@ -27,13 +27,13 @@ $res = $zip->open($zipFile);
 
 if ($res === TRUE) {
     echo "Extracting $zipFile...<br>";
-    $zip->extractTo(__DIR__);
+    $zip->extractTo(__DIR__. '/../youssi-market.com/main/');
     $zip->close();
     echo "Extraction successful.<br>";
     
     // Cleanup
     unlink($zipFile);
-    echo "Deleted $zipFile.<br>";
+    echo "Deleted $zipFile.";
     
     // Self-destruct
     // unlink(__FILE__);

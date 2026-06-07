@@ -61,4 +61,4 @@ jobs:
           curl -s "$SITE_URL/extract.php?token=youssi_market_deploy_2026"
           
           # Delete the local helper
-          # curl --ssl -k -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" "ftp://$(echo "${{ secrets.FTP_SERVER }}" | sed -E 's#^(ftp://|ftps://)##')/" -X "DELE extract.php"
+          # curl --ssl -k -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" "ftp://$(echo "${{ secrets.FTP_SERVER }}" | sed -E 's#^(ftp://|ftps://)##')/" -X "DELE $SITE_URL/extract.php"
