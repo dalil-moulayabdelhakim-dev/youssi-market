@@ -38,7 +38,7 @@
                                             <div class="col-md-4 mb-3">
                                                 <div class="card bg-primary text-white text-center p-3">
                                                     <h6>{{ __('messages.total_profits') }}</h6>
-                                                    <h3>{{ number_format($total_commissions, 2) }} DA</h3>
+                                                    <h3>{{ number_format($total_commissions ?? 0, 2) }} DA</h3>
                                                 </div>
                                             </div>
                                             <div class="col-md-8">
@@ -102,7 +102,7 @@
             const labelColor = '#a1b0cb';
             
             // 1. Profits Trend Chart
-            const commTrend = @json($commissions_trend);
+            const commTrend = @json($commissions_trend ?? []);
             const lineOptions = {
                 chart: { height: 300, type: 'line', toolbar: { show: false } },
                 series: [{ name: "{{ __('messages.profits') }}", data: commTrend.map(i => i.total) }],
@@ -113,7 +113,7 @@
             new ApexCharts(document.querySelector("#profitsTrendChart"), lineOptions).render();
 
             // 2. Category Sales Chart (Donut)
-            const catSales = @json($category_sales);
+            const catSales = @json($category_sales ?? []);
             const donutOptions = {
                 chart: { height: 350, type: 'donut' },
                 labels: catSales.map(i => i.name),
@@ -124,7 +124,7 @@
             new ApexCharts(document.querySelector("#categorySalesChart"), donutOptions).render();
 
             // 3. Top Sellers Chart (Bar)
-            const topStores = @json($top_stores);
+            const topStores = @json($top_stores ?? []);
             const barOptions = {
                 chart: { height: 350, type: 'bar', toolbar: { show: false } },
                 series: [{ name: "{{ __('messages.commission') }}", data: topStores.map(i => i.total_commission) }],

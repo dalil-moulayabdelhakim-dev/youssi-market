@@ -438,13 +438,62 @@ class AdminController extends Controller
             ];
         });
 
-        // 2) Subscription payments history
+        // 1) Overall Total Commission
+        $total_commissions = Commission::sum('amount') ?? 0;
+
+        // 2) Trend line chart (last 30 days)
+        $commissions_trend = Commission::select(
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('SUM(amount) as total')
+        )
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
+
+        // 3) Top 5 stores by commission
+        $top_stores = Commission::select('store_id', DB::raw('SUM(amount) as total_commission'))
+            ->with('store:id,name')
+            ->groupBy('store_id')
+            ->orderBy('total_commission', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => optional($item->store)->name ?? __('messages.no_name'),
+                    'total_commission' => (float)$item->total_commission
+                ];
+            });
+
+        // 4) Category sales distribution
+        $category_sales = OrderItem::join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->select('categories.name', DB::raw('SUM(order_items.price * order_items.quantity) as total_sales'))
+            ->groupBy('categories.id', 'categories.name')
+            ->orderBy('total_sales', 'desc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => __('messages.' . $item->name) == 'messages.' . $item->name ? str_replace('_', ' ', $item->name) : __('messages.' . $item->name),
+                    'total_sales' => (float)$item->total_sales
+                ];
+            });
+
+        // 5) Subscription payments history
         $subscriptionPayments = \App\Models\PaymentRequest::with(['store', 'subscription_method'])->orderByDesc('created_at')->get();
 
-        // 3) Commission transaction logs
+        // 6) Commission transaction logs
         $commissionLogs = \App\Models\Commission::with(['store', 'order'])->orderByDesc('created_at')->get();
 
-        return view('admin.pages.revenue', compact('storesData', 'subscriptionPayments', 'commissionLogs'));
+        return view('admin.pages.revenue', [
+            'storesData' => $storesData,
+            'total_commissions' => $total_commissions,
+            'commissions_trend' => $commissions_trend,
+            'top_stores' => $top_stores,
+            'category_sales' => $category_sales,
+            'subscriptionPayments' => $subscriptionPayments,
+            'commissionLogs' => $commissionLogs,
+        ]);
     }
 
     public function ticketsView()
