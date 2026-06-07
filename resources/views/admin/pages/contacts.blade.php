@@ -127,7 +127,7 @@
                                                                             <hr>
                                                                             <!-- نموذج الرد وتغيير الحالة -->
                                                                             <form
-                                                                                action="{{ route('tickets.reply', $ticket->id) }}"
+                                                                                action="{{ route('admin-tickets.reply', $ticket->id) }}"
                                                                                 method="POST">
                                                                                 @csrf
                                                                                 <div class="mb-3">
