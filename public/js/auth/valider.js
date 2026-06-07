@@ -18,14 +18,18 @@ document.addEventListener("DOMContentLoaded", function () {
                             data.store.address;
                         document.getElementById("store_contact").textContent =
                             data.store.contact;
-                        document.getElementById(
-                            "store_subscription_status"
-                        ).textContent = data.store.subscription_status;
+                        document.getElementById("store_subscription_status").textContent =
+                            data.store.subscription_status;
 
-                        let modal = new bootstrap.Modal(
+                        // Set store ID for manual activation
+                        if (document.getElementById("activation_store_id")) {
+                            document.getElementById("activation_store_id").value = data.store.id;
+                        }
+
+                        var storeModal = new bootstrap.Modal(
                             document.getElementById("storeModal")
                         );
-                        modal.show();
+                        storeModal.show();
                     }
                 });
         });

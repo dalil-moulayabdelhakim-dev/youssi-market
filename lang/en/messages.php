@@ -382,4 +382,9 @@ return [
     'payment_proof_sent_grace_period' => 'Payment proof submitted. Your store is now active for a 48-hour grace period during review.',
     'insufficient_balance' => 'Insufficient withdrawable balance.',
     'delivery_unavailable_for_wilaya' => 'Delivery is currently unavailable for this Wilaya.',
+    'manual_activation' => 'Manual Activation',
+    'activate_monthly' => 'Activate (1 Month)',
+    'activate_lifetime' => 'Activate (Lifetime)',
+    'store_activated_successfully' => 'Store activated successfully.',
+    'plan_not_found' => 'The requested plan was not found.',
 ];

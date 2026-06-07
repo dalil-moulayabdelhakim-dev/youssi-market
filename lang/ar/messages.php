@@ -379,6 +379,11 @@ return [
     'payment_proof_sent_grace_period' => 'تم إرسال إثبات الدفع. متجرك نشط الآن لمدة 48 ساعة (فترة سماح) حتى تتم المراجعة.',
     'insufficient_balance' => 'الرصيد المتاح للسحب غير كافٍ.',
     'delivery_unavailable_for_wilaya' => 'التوصيل غير متوفر حالياً لهذه الولاية.',
+    'manual_activation' => 'التفعيل اليدوي',
+    'activate_monthly' => 'تفعيل (شهر واحد)',
+    'activate_lifetime' => 'تفعيل (مدى الحياة)',
+    'store_activated_successfully' => 'تم تفعيل المتجر بنجاح.',
+    'plan_not_found' => 'الخطة المطلوبة غير موجودة.',
 ];
 
 

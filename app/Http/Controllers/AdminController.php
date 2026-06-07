@@ -229,6 +229,39 @@ class AdminController extends Controller
         ]);
     }
 
+    public function activateStore(Request $request)
+    {
+        $request->validate([
+            'store_id' => 'required|exists:stores,id',
+            'plan' => 'required|in:monthly,lifetime',
+        ]);
+
+        $store = Store::findOrFail($request->store_id);
+        $subMethod = \App\Models\SubscriptionMethod::where('name', $request->plan)->first();
+
+        if (!$subMethod) {
+            return back()->with('error', [__('messages.plan_not_found')]);
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($store, $subMethod) {
+            $months = $subMethod->duration_months ?? ($subMethod->name === 'monthly' ? 1 : 12);
+            
+            $store->subscription_status = 'active';
+            
+            // For manual activation, we can either extend or reset. 
+            // Usually, manual activation resets to now + duration or extends if active.
+            $startFrom = ($store->subscription_ends_at && $store->subscription_ends_at->isFuture()) 
+                ? $store->subscription_ends_at 
+                : now();
+
+            $store->subscription_ends_at = $startFrom->addMonths($months);
+            $store->save();
+        });
+
+        Session::flash('success', [__('messages.store_activated_successfully')]);
+        return back();
+    }
+
     public function approve(Request $request)
     {
         $paymentRequest = PaymentRequest::findOrFail($request->request_id);

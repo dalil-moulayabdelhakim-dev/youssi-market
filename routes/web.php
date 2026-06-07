@@ -51,6 +51,7 @@ Route::middleware([
             Route::get('/users/{id}/store', [AdminController::class, 'userStore'])->name('users.store'); // View user’s store
             Route::post('/payment-requests/approve', [AdminController::class, 'approve'])->name('payment_requests.approve'); // Approve payment
             Route::post('/payment-requests/reject', [AdminController::class, 'reject'])->name('payment_requests.reject'); // Reject payment
+            Route::post('/store/activate', [AdminController::class, 'activateStore'])->name('store.activate'); // Manual store activation
             Route::post('/u/add', [AdminController::class, 'addUser'])->name('user.add'); // Add new user
             Route::post('/u/update/{id}/status', [AdminController::class, 'updateUserStatus'])->name('users.status');
             Route::get('/admin/profits', [AdminController::class, 'profitsPage'])->name('admin.profits'); // View profits

@@ -204,6 +204,21 @@
                                     </p>
                                     <p><strong>{{ __('messages.subscription_status') }}:</strong> <span
                                             id="store_subscription_status"></span></p>
+
+                                    <hr>
+                                    <h5>{{ __('messages.manual_activation') }}</h5>
+                                    <form action="{{ route('admin-store.activate') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="store_id" id="activation_store_id">
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" name="plan" value="monthly" class="btn btn-primary">
+                                                <i class="bx bx-calendar me-1"></i> {{ __('messages.activate_monthly') }}
+                                            </button>
+                                            <button type="submit" name="plan" value="lifetime" class="btn btn-success">
+                                                <i class="bx bx-infinite me-1"></i> {{ __('messages.activate_lifetime') }}
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
