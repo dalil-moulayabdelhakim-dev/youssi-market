@@ -51,14 +51,14 @@ jobs:
         env:
           SITE_URL: ${{ secrets.FTP_SITE_URL }}
         run: |
-          if [ -z "$FTP_SITE_URL" ]; then
-            echo "Error: FTP_SITE_URL secret is not set. Cannot trigger extraction."
+          if [ -z "$SITE_URL" ]; then
+            echo "Error: SITE_URL secret is not set. Cannot trigger extraction."
             exit 1
           fi
           
           # Trigger the PHP script with the security token
-          echo "Triggering extraction at $FTP_SITE_URL/extract.php..."
-          curl -s "$FTP_SITE_URL/extract.php?token=youssi_market_deploy_2026"
+          echo "Triggering extraction at $SITE_URL/extract.php..."
+          curl -s "$SITE_URL/extract.php?token=youssi_market_deploy_2026"
           
           # Delete the local helper
           # curl --ssl -k -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" "ftp://$(echo "${{ secrets.FTP_SERVER }}" | sed -E 's#^(ftp://|ftps://)##')/" -X "DELE extract.php"
