@@ -244,7 +244,7 @@ class AdminController extends Controller
         }
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($store, $subMethod) {
-            $months = $subMethod->duration_months ?? ($subMethod->name === 'monthly' ? 1 : 12);
+            $months = (int) ($subMethod->duration_months ?? ($subMethod->name === 'monthly' ? 1 : 12));
             
             $store->subscription_status = 'active';
             
@@ -275,7 +275,7 @@ class AdminController extends Controller
 
             // تحديث المتجر
             // Use duration_months from subscription method or default
-            $months = $subMethod->duration_months ?? ($subMethod->name === 'monthly' ? 1 : 12);
+            $months = (int) ($subMethod->duration_months ?? ($subMethod->name === 'monthly' ? 1 : 12));
             
             $store->subscription_status = 'active';
             
