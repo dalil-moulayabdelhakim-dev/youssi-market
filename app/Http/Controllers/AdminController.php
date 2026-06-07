@@ -181,6 +181,57 @@ class AdminController extends Controller
         return view('admin.pages.subscription-requests-view', compact('requests'));
     }
 
+    public function subscriptionPlansView()
+    {
+        $plans = \App\Models\SubscriptionMethod::all();
+        return view('admin.pages.subscription-plans', compact('plans'));
+    }
+
+    public function addSubscriptionPlan(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|unique:subscription_methods,name',
+            'price' => 'required|numeric|min:0',
+            'duration_days' => 'required|integer|min:1',
+            'display_name_en' => 'nullable|string',
+            'display_name_ar' => 'nullable|string',
+            'features_en' => 'nullable|string',
+            'features_ar' => 'nullable|string',
+        ]);
+
+        \App\Models\SubscriptionMethod::create($request->all());
+
+        return back()->with('success', [__('messages.operation_success')]);
+    }
+
+    public function updateSubscriptionPlan(Request $request, $id)
+    {
+        $plan = \App\Models\SubscriptionMethod::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|unique:subscription_methods,name,' . $id,
+            'price' => 'required|numeric|min:0',
+            'duration_days' => 'required|integer|min:1',
+        ]);
+
+        $plan->update($request->all());
+
+        return back()->with('success', [__('messages.operation_success')]);
+    }
+
+    public function deleteSubscriptionPlan($id)
+    {
+        $plan = \App\Models\SubscriptionMethod::findOrFail($id);
+        
+        if ($plan->stores()->count() > 0) {
+            return back()->with('error', [__('messages.cannot_delete_plan_in_use')]);
+        }
+
+        $plan->delete();
+
+        return back()->with('success', [__('messages.operation_success')]);
+    }
+
     public function subscriptionDetails($id)
     {
         $payment = PaymentRequest::findOrFail($id);
@@ -251,7 +302,7 @@ class AdminController extends Controller
         }
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($store, $subMethod) {
-            $months = (int) ($subMethod->duration_months ?? ($subMethod->name === 'monthly' ? 1 : 12));
+            $days = (int) ($subMethod->duration_days ?? 30);
             
             $store->subscription_status = 'active';
             
@@ -261,7 +312,7 @@ class AdminController extends Controller
                 ? $store->subscription_ends_at 
                 : now();
 
-            $store->subscription_ends_at = $startFrom->addMonths($months);
+            $store->subscription_ends_at = $startFrom->addDays($days);
             $store->save();
         });
 
@@ -299,8 +350,8 @@ class AdminController extends Controller
             $paymentRequest->save();
 
             // تحديث المتجر
-            // Use duration_months from subscription method or default
-            $months = (int) ($subMethod->duration_months ?? ($subMethod->name === 'monthly' ? 1 : 12));
+            // Use duration_days from subscription method or default
+            $days = (int) ($subMethod->duration_days ?? 30);
             
             $store->subscription_status = 'active';
             
@@ -309,7 +360,7 @@ class AdminController extends Controller
                 ? $store->subscription_ends_at 
                 : now();
 
-            $store->subscription_ends_at = $startFrom->addMonths($months);
+            $store->subscription_ends_at = $startFrom->addDays($days);
             $store->save();
         });
 

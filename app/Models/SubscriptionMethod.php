@@ -9,7 +9,7 @@ class SubscriptionMethod extends Model
     protected $fillable = [
         'name',
         'price',
-        'duration_months',
+        'duration_days',
         'display_name_en',
         'display_name_ar',
         'features_en',
@@ -18,7 +18,7 @@ class SubscriptionMethod extends Model
 
     protected $casts = [
         'price' => 'integer',
-        'duration_months' => 'integer',
+        'duration_days' => 'integer',
     ];
 
     public function stores()

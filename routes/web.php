@@ -46,6 +46,10 @@ Route::middleware([
             'as' => 'admin-',
         ], function () {
             Route::get('/sb/requests', [AdminController::class, 'subscriptionRequestView'])->name('subscription-request'); // View subscription requests
+            Route::get('/sb/plans', [AdminController::class, 'subscriptionPlansView'])->name('subscription-plans'); // Manage subscription plans
+            Route::post('/sb/plans', [AdminController::class, 'addSubscriptionPlan'])->name('subscription-plans.add'); // Add subscription plan
+            Route::put('/sb/plans/{id}', [AdminController::class, 'updateSubscriptionPlan'])->name('subscription-plans.update'); // Update subscription plan
+            Route::delete('/sb/plans/{id}', [AdminController::class, 'deleteSubscriptionPlan'])->name('subscription-plans.delete'); // Delete subscription plan
             Route::get('u/view', [AdminController::class, 'usersView'])->name('users.view'); // View all users
             Route::get('/payment-requests/{id}', [AdminController::class, 'subscriptionDetails'])->name('subscription-details'); // View payment request details
             Route::get('/users/{id}/store', [AdminController::class, 'userStore'])->name('users.store'); // View user’s store

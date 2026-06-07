@@ -391,6 +391,18 @@ return [
     'plan_not_found' => 'الخطة المطلوبة غير موجودة.',
     'deactivate' => 'إلغاء التفعيل',
     'store_deactivated_successfully' => 'تم إلغاء تفعيل المتجر بنجاح.',
+    'subscription_plans' => 'خطط الاشتراك',
+    'manage_plans' => 'إدارة خطط الاشتراك',
+    'add_new_plan' => 'إضافة خطة جديدة',
+    'duration_days' => 'المدة (بالأيام)',
+    'days' => 'يوم',
+    'edit_plan' => 'تعديل الخطة',
+    'add_plan' => 'إضافة الخطة',
+    'internal_name' => 'الاسم الداخلي',
+    'display_name_en' => 'اسم العرض (EN)',
+    'display_name_ar' => 'اسم العرض (AR)',
+    'confirm_delete' => 'هل أنت متأكد من حذف هذه الخطة؟',
+    'cannot_delete_plan_in_use' => 'لا يمكن حذف هذه الخطة لأنها مخصصة لواحد أو أكثر من المتاجر.',
 ];
 
 

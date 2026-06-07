@@ -32,9 +32,16 @@
             </a>
         </li>
         <li class="menu-item {{ Route::is('admin-subscription-request') ? 'active' : '' }}">
-            <a href="{{ route('admin-subscription-request') }}" class="menu-link">
+            <a href="{{route('admin-subscription-request')}}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-credit-card"></i>
                 <div class="text-truncate" data-i18n="Basic">{{ __('messages.subscription_requests') }}
+                </div>
+            </a>
+        </li>
+        <li class="menu-item {{ Route::is('admin-subscription-plans') ? 'active' : '' }}">
+            <a href="{{route('admin-subscription-plans')}}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-list-ul"></i>
+                <div class="text-truncate" data-i18n="Basic">{{ __('messages.subscription_plans') }}
                 </div>
             </a>
         </li>
