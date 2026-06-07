@@ -1,52 +1,53 @@
-name: Deploy Youssi Market
+name: Deploy to cPanel
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3'
-        extensions: mbstring, xml, ctype, iconv, mysql, bcmath
-        coverage: none
+      - name: Setup PHP & Node
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-    - name: Install Dependencies (PHP)
-      run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --optimize-autoloader
+      - name: Install Dependencies & Build
+        run: |
+          composer install --no-dev --optimize-autoloader
+          npm install
+          npm run build
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Zip files
+        run: |
+          zip -r deploy.zip . -x "*.git*" "node_modules/*" ".github/*" "storage/logs/*" "tests/*" "deploy.zip"
+          ls -lh deploy.zip
 
-    - name: Install Dependencies (JS) & Build
-      run: |
-        npm install
-        npm run build
+      - name: Upload to cPanel via FTP
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+        run: |
+          # Clean FTP_SERVER of any ftp:// or ftps:// prefix to prevent double prefixing
+          CLEAN_SERVER=$(echo "$FTP_SERVER" | sed -E 's#^(ftp://|ftps://)##')
 
-    - name: Directory Permissions
-      run: chmod -R 777 storage bootstrap/cache
+          echo "Uploading deploy.zip to ftp://$CLEAN_SERVER/deploy.zip..."
+          curl --ftp-create-dirs --ssl -k -T deploy.zip -u "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$CLEAN_SERVER/deploy.zip"
 
-    # Example Deployment via SSH (Tailor to your specific server)
-    # - name: Deploy to Server
-    #   uses: appleboy/ssh-action@master
-    #   with:
-    #     host: ${{ secrets.REMOTE_HOST }}
-    #     username: ${{ secrets.REMOTE_USER }}
-    #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-    #     script: |
-    #       cd /var/www/youssi-market
-    #       git pull origin main
-    #       composer install --no-dev --optimize-autoloader
-    #       php artisan migrate --force
-    #       php artisan config:cache
-    #       php artisan route:cache
-    #       php artisan view:cache
-    #       php artisan optimize
+          if [ -f deploy.php ]; then
+            echo "Uploading deploy.php to ftp://$CLEAN_SERVER/deploy.php..."
+            curl --ftp-create-dirs --ssl -k -T deploy.php -u "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$CLEAN_SERVER/deploy.php"
+          fi
+          if [ -f test_deploy.php ]; then
+            echo "Uploading test_deploy.php to ftp://$CLEAN_SERVER/test_deploy.php..."
+            curl --ftp-create-dirs --ssl -k -T test_deploy.php -u "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$CLEAN_SERVER/test_deploy.php"
+          fi
