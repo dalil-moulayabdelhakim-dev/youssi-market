@@ -18,12 +18,28 @@ document.addEventListener("DOMContentLoaded", function () {
                             data.store.address;
                         document.getElementById("store_contact").textContent =
                             data.store.contact;
-                        document.getElementById("store_subscription_status").textContent =
-                            data.store.subscription_status;
 
-                        // Set store ID for manual activation
+                        // Handle Status Badge
+                        let statusText = data.store.subscription_status;
+                        let badgeClass = 'bg-secondary';
+                        if (data.store.is_active) {
+                            badgeClass = statusText === 'trial' ? 'bg-info' : 'bg-success';
+                        } else {
+                            badgeClass = 'bg-danger';
+                        }
+
+                        document.getElementById("store_subscription_status").innerHTML = 
+                            `<span class="badge ${badgeClass}">${statusText.toUpperCase()}</span>`;
+
+                        document.getElementById("store_expiry_date").textContent = 
+                            data.store.ends_at || '—';
+
+                        // Set store ID for manual activation and deactivation
                         if (document.getElementById("activation_store_id")) {
                             document.getElementById("activation_store_id").value = data.store.id;
+                        }
+                        if (document.getElementById("deactivate_store_id")) {
+                            document.getElementById("deactivate_store_id").value = data.store.id;
                         }
 
                         var storeModal = new bootstrap.Modal(

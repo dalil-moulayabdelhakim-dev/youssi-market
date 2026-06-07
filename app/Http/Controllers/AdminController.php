@@ -225,6 +225,10 @@ class AdminController extends Controller
                 'address' => $store->address,
                 'contact' => $store->contact,
                 'subscription_status' => $store->subscription_status,
+                'is_active' => $store->hasActiveSubscription(),
+                'ends_at' => $store->subscription_status === 'trial' 
+                    ? ($store->trial_ends_at ? $store->trial_ends_at->format('Y-m-d') : null)
+                    : ($store->subscription_ends_at ? $store->subscription_ends_at->format('Y-m-d') : null),
             ]
         ]);
     }
@@ -259,6 +263,24 @@ class AdminController extends Controller
         });
 
         Session::flash('success', [__('messages.store_activated_successfully')]);
+        return back();
+    }
+
+    public function deactivateStore(Request $request)
+    {
+        $request->validate([
+            'store_id' => 'required|exists:stores,id',
+        ]);
+
+        $store = Store::findOrFail($request->store_id);
+
+        $store->update([
+            'subscription_status' => 'expired',
+            'subscription_ends_at' => now(),
+            'trial_ends_at' => now(),
+        ]);
+
+        Session::flash('success', [__('messages.store_deactivated_successfully')]);
         return back();
     }
 

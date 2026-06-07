@@ -387,4 +387,6 @@ return [
     'activate_lifetime' => 'Activate (Lifetime)',
     'store_activated_successfully' => 'Store activated successfully.',
     'plan_not_found' => 'The requested plan was not found.',
+    'deactivate' => 'Deactivate',
+    'store_deactivated_successfully' => 'Store deactivated successfully.',
 ];

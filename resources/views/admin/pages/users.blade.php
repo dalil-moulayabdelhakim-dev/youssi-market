@@ -204,9 +204,21 @@
                                     </p>
                                     <p><strong>{{ __('messages.subscription_status') }}:</strong> <span
                                             id="store_subscription_status"></span></p>
+                                    <p><strong>{{ __('messages.expiry_date') }}:</strong> <span
+                                            id="store_expiry_date"></span></p>
 
                                     <hr>
-                                    <h5>{{ __('messages.manual_activation') }}</h5>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5>{{ __('messages.manual_activation') }}</h5>
+                                        
+                                        <form action="{{ route('admin-store.deactivate') }}" method="POST" id="deactivateForm">
+                                            @csrf
+                                            <input type="hidden" name="store_id" id="deactivate_store_id">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="bx bx-power-off me-1"></i> {{ __('messages.deactivate') }}
+                                            </button>
+                                        </form>
+                                    </div>
                                     <form action="{{ route('admin-store.activate') }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="store_id" id="activation_store_id">

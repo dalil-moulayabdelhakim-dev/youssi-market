@@ -384,6 +384,8 @@ return [
     'activate_lifetime' => 'تفعيل (مدى الحياة)',
     'store_activated_successfully' => 'تم تفعيل المتجر بنجاح.',
     'plan_not_found' => 'الخطة المطلوبة غير موجودة.',
+    'deactivate' => 'إلغاء التفعيل',
+    'store_deactivated_successfully' => 'تم إلغاء تفعيل المتجر بنجاح.',
 ];
 
 
