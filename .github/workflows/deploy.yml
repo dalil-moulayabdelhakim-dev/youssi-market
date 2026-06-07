@@ -28,7 +28,8 @@ jobs:
 
       - name: Zip files
         run: |
-          zip -r deploy.zip . -x "*.git*" "node_modules/*" ".github/*" "storage/logs/*" "tests/*" "deploy.zip"
+          # Create zip excluding unnecessary files
+          zip -r deploy.zip . -x "*.git*" "node_modules/*" ".github/*" "storage/logs/*" "tests/*" "deploy.zip" "extract.php"
           ls -lh deploy.zip
 
       - name: Upload to cPanel via FTP
@@ -37,17 +38,27 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
         run: |
-          # Clean FTP_SERVER of any ftp:// or ftps:// prefix to prevent double prefixing
+          # Clean FTP_SERVER of any ftp:// or ftps:// prefix
           CLEAN_SERVER=$(echo "$FTP_SERVER" | sed -E 's#^(ftp://|ftps://)##')
 
-          echo "Uploading deploy.zip to ftp://$CLEAN_SERVER/deploy.zip..."
+          echo "Uploading deploy.zip to ftp://$CLEAN_SERVER/..."
           curl --ftp-create-dirs --ssl -k -T deploy.zip -u "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$CLEAN_SERVER/deploy.zip"
 
-          if [ -f deploy.php ]; then
-            echo "Uploading deploy.php to ftp://$CLEAN_SERVER/deploy.php..."
-            curl --ftp-create-dirs --ssl -k -T deploy.php -u "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$CLEAN_SERVER/deploy.php"
+          echo "Uploading extract.php helper..."
+          curl --ftp-create-dirs --ssl -k -T extract.php -u "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$CLEAN_SERVER/extract.php"
+
+      - name: Trigger Remote Extraction
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          if [ -z "$SITE_URL" ]; then
+            echo "Error: SITE_URL secret is not set. Cannot trigger extraction."
+            exit 1
           fi
-          if [ -f test_deploy.php ]; then
-            echo "Uploading test_deploy.php to ftp://$CLEAN_SERVER/test_deploy.php..."
-            curl --ftp-create-dirs --ssl -k -T test_deploy.php -u "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$CLEAN_SERVER/test_deploy.php"
-          fi
+          
+          # Trigger the PHP script with the security token
+          echo "Triggering extraction at $SITE_URL/extract.php..."
+          curl -s "$SITE_URL/extract.php?token=youssi_market_deploy_2026"
+          
+          # Delete the local helper
+          # curl --ssl -k -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" "ftp://$(echo "${{ secrets.FTP_SERVER }}" | sed -E 's#^(ftp://|ftps://)##')/" -X "DELE extract.php"
