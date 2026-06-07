@@ -39,7 +39,7 @@ class AdminController extends Controller
                         $all_users_number = User::query()->where('id', '!=', $user->id)->count();
                         $payment_requests_number = PaymentRequest::query()->where('status', 'pending')->count();
                         $owners_number = User::where('user_type_id', 2)->count();
-                        $total_commissions = Commission::sum('amount');
+                        $total_commissions = Commission::sum('amount') ?? 0;
 
                         // 1) Trend line chart (last 30 days)
                         $commissions_trend = Commission::select(
@@ -88,16 +88,16 @@ class AdminController extends Controller
                                   ->whereBetween('trial_ends_at', [now(), now()->addDays(5)]);
                         })->with('users')->get();
 
-                        return view('admin.index', compact(
-                            'all_users_number',
-                            'payment_requests_number',
-                            'owners_number',
-                            'total_commissions',
-                            'commissions_trend',
-                            'top_stores',
-                            'category_sales',
-                            'expiring_stores'
-                        ));
+                        return view('admin.index', [
+                            'all_users_number' => $all_users_number,
+                            'payment_requests_number' => $payment_requests_number,
+                            'owners_number' => $owners_number,
+                            'total_commissions' => $total_commissions,
+                            'commissions_trend' => $commissions_trend,
+                            'top_stores' => $top_stores,
+                            'category_sales' => $category_sales,
+                            'expiring_stores' => $expiring_stores,
+                        ]);
                     })(),
 
                 2 => (function () use ($storeId, $cartCount) {
