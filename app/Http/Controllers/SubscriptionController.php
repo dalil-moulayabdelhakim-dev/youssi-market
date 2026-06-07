@@ -40,34 +40,55 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'payment_proof' => 'required|image|mimes:jpeg,png,jpg,pdf|max:2048',
-            'subscription_method' => 'required|exists:subscription_methods,id'
+            'subscription_method' => 'required|exists:subscription_methods,id',
+            'transaction_reference' => 'required|string|unique:payment_requests,transaction_reference'
         ]);
 
 
         $user = Auth::user();
+        $store = $user->store;
         $store_id = $user->store_id;
-        $payment = PaymentRequest::where('store_id', $store_id)->first();
-        if($payment){
-            Session::flash('error', [ __('messages.you_already_have_arequest')]);
+
+        $payment = PaymentRequest::where('store_id', $store_id)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($payment) {
+            Session::flash('error', [__('messages.you_already_have_arequest')]);
             return back();
         }
-        $flie = null;
+
+        $file = null;
         if ($request->hasFile('payment_proof')) {
             $postName = time() . "." . $request->file('payment_proof')->getClientOriginalExtension();
             $destination_path = 'payment_proofs/' . $user->id . '/' . $store_id;
             $path = $request->file('payment_proof')->storeAs($destination_path, $postName, 'public');
             $file = 'storage/' . $path;
         } else {
-            Session::flash('error', [__('messages.product_banner_exists')]);
+            Session::flash('error', [__('messages.payment_proof_required')]);
             return redirect()->back();
         }
-        PaymentRequest::create([
-            'store_id' => $store_id,
-            'proof_path' => $file,
-            'subscription_method_id' => $request->subscription_method,
-        ]);
 
-        Session::flash('success', [__('messages.payment_proof_sent')]);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($store, $file, $request) {
+            $gracePeriodEnds = now()->addHours(48);
+
+            PaymentRequest::create([
+                'store_id' => $store->id,
+                'proof_path' => $file,
+                'status' => 'pending',
+                'transaction_reference' => $request->transaction_reference,
+                'grace_period_ends_at' => $gracePeriodEnds,
+                'subscription_method_id' => $request->subscription_method,
+            ]);
+
+            // Grant 48h Grace Period
+            $store->update([
+                'subscription_status' => 'active',
+                'subscription_ends_at' => $gracePeriodEnds,
+            ]);
+        });
+
+        Session::flash('success', [__('messages.payment_proof_sent_grace_period')]);
 
         return redirect()->back();
     }

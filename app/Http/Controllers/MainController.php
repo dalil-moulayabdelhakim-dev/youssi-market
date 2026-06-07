@@ -21,6 +21,16 @@ class MainController extends Controller
     {
         $products = Product::join('stores', 'products.store_id', '=', 'stores.id')
             ->where('stores.subscription_status', '!=', 'expired')
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->where('stores.subscription_status', 'active')
+                        ->where('stores.subscription_ends_at', '>', now());
+                })
+                ->orWhere(function ($q) {
+                    $q->where('stores.subscription_status', 'trial')
+                        ->where('stores.trial_ends_at', '>', now());
+                });
+            })
             ->select('products.*')
             ->paginate(16);
 
@@ -29,7 +39,21 @@ class MainController extends Controller
 
     public function productDetail($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::join('stores', 'products.store_id', '=', 'stores.id')
+            ->where('stores.subscription_status', '!=', 'expired')
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->where('stores.subscription_status', 'active')
+                        ->where('stores.subscription_ends_at', '>', now());
+                })
+                ->orWhere(function ($q) {
+                    $q->where('stores.subscription_status', 'trial')
+                        ->where('stores.trial_ends_at', '>', now());
+                });
+            })
+            ->select('products.*')
+            ->findOrFail($id);
+
         $images = ProductImages::where('product_id', $id)->get();
         $user = Auth::user();
         $is_owner = false;
@@ -41,8 +65,21 @@ class MainController extends Controller
         }
 
         // Fetch dynamic related products from the same category
-        $relatedProducts = Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
+        $relatedProducts = Product::join('stores', 'products.store_id', '=', 'stores.id')
+            ->where('stores.subscription_status', '!=', 'expired')
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->where('stores.subscription_status', 'active')
+                        ->where('stores.subscription_ends_at', '>', now());
+                })
+                ->orWhere(function ($q) {
+                    $q->where('stores.subscription_status', 'trial')
+                        ->where('stores.trial_ends_at', '>', now());
+                });
+            })
+            ->where('products.category_id', $product->category_id)
+            ->where('products.id', '!=', $product->id)
+            ->select('products.*')
             ->limit(4)
             ->get();
 

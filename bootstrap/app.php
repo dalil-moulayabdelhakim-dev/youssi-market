@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'subscription' => \App\Http\Middleware\CheckSubscription::class,
+            'restrictExpired' => \App\Http\Middleware\RestrictExpiredStore::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'adminOrSeller' => \App\Http\Middleware\AdminOrSeller::class,
             'active' => \App\Http\Middleware\ActiveMiddleware::class,

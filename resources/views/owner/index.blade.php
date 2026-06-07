@@ -10,95 +10,7 @@
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
             <!-- Menu -->
-            <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-                <div class="app-brand demo">
-                    <a href="index.html" class="app-brand-link">
-                        <span class="app-brand-logo demo">
-                            <span class="text-primary">
-                                <img style="width: 80%" src="{{ asset('img/logo.jpg') }}">
-                            </span>
-                        </span>
-                    </a>
-                    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
-                        <i class="bx bx-chevron-left d-block d-xl-none align-middle"></i>
-                    </a>
-                </div>
-
-                <div class="menu-divider mt-0"></div>
-
-                <div class="menu-inner-shadow"></div>
-
-                <ul class="menu-inner py-1">
-                    <!-- Dashboards -->
-                    <li class="menu-item active">
-                        <a href="#" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-home-smile"></i>
-                            <div class="text-truncate" data-i18n="Basic">{{ __('messages.dashboard') }}</div>
-                        </a>
-                    </li>
-
-                    <li class="menu-item ">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon tf-icons bx bx-package"></i>
-                            <div class="text-truncate" data-i18n="Dashboards">{{ __('messages.products') }}</div>
-                            {{-- <span class="badge rounded-pill bg-danger ms-auto">5</span> --}}
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="{{ route('products.add-view') }}" class="menu-link">
-                                    <div class="text-truncate" data-i18n="Analytics">{{ __('messages.add_product') }}
-                                    </div>
-                                </a>
-                            </li>
-
-                            <li class="menu-item">
-                                <a href="{{ route('products.view') }}" class="menu-link">
-                                    <div class="text-truncate" data-i18n="Analytics">{{ __('messages.view_product') }}
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="menu-item">
-                        <a href="{{route('category.view')}}" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-category"></i>
-                            <div class="text-truncate" data-i18n="Basic">{{ __('messages.categories') }}</div>
-                        </a>
-                    </li>
-
-                    <li class="menu-item">
-                        <a href="{{ route('order.view') }}" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-box"></i>
-                            <div class="text-truncate" data-i18n="Basic">{{ __('messages.orders') }}</div>
-                        </a>
-                    </li>
-
-                    <li class="menu-item">
-                        <a href="{{ route('wilaya.add-view') }}" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-mail-send"></i>
-                            <div class="text-truncate" data-i18n="Basic">{{ __('messages.delivery') }}</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{{ route('owner-payouts.view') }}" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-wallet"></i>
-                            <div class="text-truncate" data-i18n="Basic">{{ __('messages.payout_requests') }}</div>
-                        </a>
-                    </li>
-
-
-                </ul>
-                <div class="mt-auto p-3">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-danger w-100 d-flex align-items-center">
-                            <i class="bx bx-log-out me-2"></i>
-                            <span>{{ __('messages.logout') }}</span>
-                        </button>
-                    </form>
-                </div>
-            </aside>
+            @include('owner.layout.sidebar')
             <!-- / Menu -->
 
             <!-- Layout container -->
@@ -197,109 +109,49 @@
                                         </div>
                                     </div>
                                 </div>
-                                {{-- <div class="col-lg-6 col-md-12 col-6 mb-6">
-                                        <div class="card h-100">
-                                            <div class="card-body">
-                                                <div
-                                                    class="card-title d-flex align-items-start justify-content-between mb-4">
-                                                    <div class="avatar flex-shrink-0">
-                                                        <img src="{{ asset('owner/assets/img/icons/unicons/wallet-info.png') }}"
-                                                            alt="wallet info" class="rounded" />
-                                                    </div>
-                                                    <div class="dropdown">
-                                                        <button class="btn p-0" type="button" id="cardOpt6"
-                                                            data-bs-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false">
-                                                            <i
-                                                                class="icon-base bx bx-dots-vertical-rounded text-body-secondary"></i>
-                                                        </button>
-                                                        <div class="dropdown-menu dropdown-menu-end"
-                                                            aria-labelledby="cardOpt6">
-                                                            <a class="dropdown-item" href="javascript:void(0);">View
-                                                                More</a>
-                                                            <a class="dropdown-item"
-                                                                href="javascript:void(0);">Delete</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <p class="mb-1">Sales</p>
-                                                <h4 class="card-title mb-3">$4,679</h4>
-                                                <small class="text-success fw-medium"><i
-                                                        class="icon-base bx bx-up-arrow-alt"></i> +28.42%</small>
-                                            </div>
-                                        </div>
-                                    </div> --}}
                             </div>
                         </div>
 
-                        {{-- <div class="col-12 col-md-8 col-lg-12 col-xxl-4 order-3 order-md-2 profile-report">
-                                <div class="row">
-                                    <div class="col-6 mb-6 payments">
-                                        <div class="card h-100">
-                                            <div class="card-body">
-                                                <div
-                                                    class="card-title d-flex align-items-start justify-content-between mb-4">
-                                                    <div class="avatar flex-shrink-0">
-                                                        <img src="{{ asset('owner/assets/img/icons/unicons/paypal.png') }}"
-                                                            alt="paypal" class="rounded" />
-                                                    </div>
-                                                    <div class="dropdown">
-                                                        <button class="btn p-0" type="button" id="cardOpt4"
-                                                            data-bs-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false">
-                                                            <i
-                                                                class="icon-base bx bx-dots-vertical-rounded text-body-secondary"></i>
-                                                        </button>
-                                                        <div class="dropdown-menu dropdown-menu-end"
-                                                            aria-labelledby="cardOpt4">
-                                                            <a class="dropdown-item" href="javascript:void(0);">View
-                                                                More</a>
-                                                            <a class="dropdown-item"
-                                                                href="javascript:void(0);">Delete</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <p class="mb-1">Payments</p>
-                                                <h4 class="card-title mb-3">$2,456</h4>
-                                                <small class="text-danger fw-medium"><i
-                                                        class="icon-base bx bx-down-arrow-alt"></i> -14.82%</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6 mb-6 transactions">
-                                        <div class="card h-100">
-                                            <div class="card-body">
-                                                <div
-                                                    class="card-title d-flex align-items-start justify-content-between mb-4">
-                                                    <div class="avatar flex-shrink-0">
-                                                        <img src="{{ asset('owner/assets/img/icons/unicons/cc-primary.png') }}"
-                                                            alt="Credit Card" class="rounded" />
-                                                    </div>
-                                                    <div class="dropdown">
-                                                        <button class="btn p-0" type="button" id="cardOpt1"
-                                                            data-bs-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false">
-                                                            <i
-                                                                class="icon-base bx bx-dots-vertical-rounded text-body-secondary"></i>
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="cardOpt1">
-                                                            <a class="dropdown-item" href="javascript:void(0);">View
-                                                                More</a>
-                                                            <a class="dropdown-item"
-                                                                href="javascript:void(0);">Delete</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <p class="mb-1">Transactions</p>
-                                                <h4 class="card-title mb-3">$14,857</h4>
-                                                <small class="text-success fw-medium"><i
-                                                        class="icon-base bx bx-up-arrow-alt"></i> +28.14%</small>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <!-- Charts Section -->
+<div class="row">
+    <!-- Revenue Trend -->
+    <div class="col-12 col-lg-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title m-0">{{ __('messages.revenue_trend') }}</h5>
+            </div>
+            <div class="card-body">
+                <div id="revenueTrendChart"></div>
+            </div>
+        </div>
+    </div>
 
-                                </div>
-                            </div> --}}
+    <!-- Top Products -->
+    <div class="col-12 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title m-0">{{ __('messages.top_5_products') }}</h5>
+            </div>
+            <div class="card-body">
+                <div id="topProductsChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Orders Trend -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title m-0">{{ __('messages.orders_trend') }}</h5>
+            </div>
+            <div class="card-body">
+                <div id="ordersTrendChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
                     </div>
                 </div>
                 <!-- / Content -->
@@ -317,12 +169,115 @@
 
     <!-- Overlay -->
     <div class="layout-overlay layout-menu-toggle"></div>
-    </div>
-    <!-- / Layout wrapper -->
+</div>
+<!-- / Layout wrapper -->
 
-    <!-- Core JS -->
+<!-- Core JS -->
 
-    @include('owner.layout.scripts')
+@include('owner.layout.scripts')
+
+<!-- Charts Scripts -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+const primaryColor = '#03c8e2';
+const successColor = '#71dd37';
+const infoColor = '#03c3ec';
+const warningColor = '#ffab00';
+const borderColor = '#f0f2f4';
+const labelColor = '#a1b0cb';
+const headingColor = '#566a7f';
+
+// Data from controller
+const revenueTrend = @json($revenue_trend);
+const ordersTrend = @json($orders_trend);
+const topProducts = @json($top_products);
+
+// 1. Revenue Trend Line Chart
+const revOptions = {
+chart: {
+height: 350,
+type: 'area',
+toolbar: { show: false }
+},
+series: [{
+name: "{{ __('messages.revenue') }}",
+data: revenueTrend.map(item => item.total)
+}],
+xaxis: {
+categories: revenueTrend.map(item => item.date),
+labels: { style: { colors: labelColor } }
+},
+yaxis: {
+labels: {
+style: { colors: labelColor },
+formatter: function(val) { return val + " DA"; }
+}
+},
+colors: [successColor],
+fill: {
+type: 'gradient',
+gradient: { opacityFrom: 0.5, opacityTo: 0.1 }
+},
+stroke: { curve: 'smooth', width: 3 },
+dataLabels: { enabled: false }
+};
+new ApexCharts(document.querySelector("#revenueTrendChart"), revOptions).render();
+
+// 2. Orders Trend Chart
+const orderOptions = {
+chart: {
+height: 300,
+type: 'bar',
+toolbar: { show: false }
+},
+series: [{
+name: "{{ __('messages.orders') }}",
+data: ordersTrend.map(item => item.total)
+}],
+xaxis: {
+categories: ordersTrend.map(item => item.date),
+labels: { style: { colors: labelColor } }
+},
+colors: [primaryColor],
+plotOptions: {
+bar: { borderRadius: 4, columnWidth: '50%' }
+},
+dataLabels: { enabled: false }
+};
+new ApexCharts(document.querySelector("#ordersTrendChart"), orderOptions).render();
+
+// 3. Top Products Doughnut Chart
+const productOptions = {
+chart: {
+height: 350,
+type: 'donut'
+},
+labels: topProducts.map(item => item.title),
+series: topProducts.map(item => item.total_sold),
+colors: ['#03c8e2', '#71dd37', '#ff3e1d', '#696cff', '#ffab00'],
+legend: { position: 'bottom', labels: { colors: labelColor } },
+dataLabels: { enabled: false },
+plotOptions: {
+pie: {
+donut: {
+size: '70%',
+labels: {
+show: true,
+total: {
+    show: true,
+    label: "{{ __('messages.total') }}",
+    formatter: function(w) {
+        return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+    }
+}
+}
+}
+}
+}
+};
+new ApexCharts(document.querySelector("#topProductsChart"), productOptions).render();
+});
+</script>
 </body>
 
 </html>

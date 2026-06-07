@@ -15,8 +15,23 @@ class Store extends Model
         'trial_ends_at',
         'subscription_ends_at',
         'subscription_status',
+        'holding_balance',
+        'withdrawable_balance',
         'commission_rate'
+    ];
 
+    /**
+     * Checks if the store currently has an active subscription or trial.
+     */
+    public function hasActiveSubscription(): bool
+    {
+        return ($this->subscription_status === 'active' && $this->subscription_ends_at?->isFuture()) ||
+               ($this->subscription_status === 'trial' && $this->trial_ends_at?->isFuture());
+    }
+
+    protected $casts = [
+        'subscription_ends_at' => 'datetime',
+        'trial_ends_at' => 'datetime',
     ];
 
     public function users()
@@ -37,7 +52,7 @@ class Store extends Model
     public function wilayas()
     {
         return $this->belongsToMany(Wilaya::class, 'store_wilayas')
-            ->withPivot('price_to_home', 'price_to_office')
+            ->withPivot('base_weight', 'price_to_home', 'price_to_office', 'extra_price_per_kg_home', 'extra_price_per_kg_office')
             ->withTimestamps();
     }
 

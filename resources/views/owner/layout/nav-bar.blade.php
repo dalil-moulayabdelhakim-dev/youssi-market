@@ -52,29 +52,6 @@
                             <div class="dropdown-divider my-1"></div>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{{ route('profile') }}">
-                                <i class="icon-base bx bx-user icon-md me-3"></i><span>{{ __('messages.profile') }}</span>
-                            </a>
-                        </li>
-                        @if(Auth::user()->user_type_id == 2)
-                        <li>
-                            <a class="dropdown-item" href="{{ route('subscribe-view') }}">
-                                <span class="d-flex align-items-center align-middle">
-                                    <i class="flex-shrink-0 icon-base bx bx-credit-card icon-md me-3"></i><span
-                                        class="flex-grow-1 align-middle{{ app()->getLocale() === 'ar' ? ' ms-3' : '' }}">{{ __('messages.subscription_plan') }}</span>
-                                    @if(Auth::user()->store && Auth::user()->store->subscription_status === 'active')
-                                        <span class="flex-shrink-0 badge rounded-pill bg-success">{{ __('messages.active') }}</span>
-                                    @else
-                                        <span class="flex-shrink-0 badge rounded-pill bg-danger">{{ __('messages.expired') }}</span>
-                                    @endif
-                                </span>
-                            </a>
-                        </li>
-                        @endif
-                        <li>
-                            <div class="dropdown-divider my-1"></div>
-                        </li>
-                        <li>
                             <form id="logout-form-navbar" method="POST" action="{{ route('logout') }}" class="d-none">
                                 @csrf
                             </form>

@@ -201,6 +201,9 @@ return [
     'name' => 'الاسم (باللاتينية)',
     'categories_list' => 'قائمة الفئات',
     'revenue' => 'الربح',
+    'revenue_trend' => 'اتجاه الأرباح (آخر 30 يومًا)',
+    'orders_trend' => 'اتجاه الطلبات (آخر 30 يومًا)',
+    'top_5_products' => 'أفضل 5 منتجات مبيعًا',
     'customers' => 'العملاء',
 
     'wilaya' => 'الولاية',
@@ -269,6 +272,13 @@ return [
     'store_settings' => 'اعدادات المتجر',
     'language' => 'اللغة',
     'settings' => 'الاعدادات',
+    'parameters' => 'الاعدادات',
+    'language_settings' => 'إعدادات اللغة',
+    'select_language' => 'اختر اللغة',
+    'other_parameters' => 'معايير أخرى',
+    'enable_notifications' => 'تفعيل التنبيهات',
+    'auto_accept_orders' => 'قبول الطلبات تلقائياً',
+    'save_parameters' => 'حفظ المعايير',
     'your_subscription_has_expired' => 'لقد انتهت صلاحية اشتراكك.',
 
     'ticket_management' => 'إدارة التذاكر',
@@ -365,6 +375,10 @@ return [
     'expiry_date' => 'تاريخ الانتهاء',
     'subscription_history' => 'سجل الاشتراكات',
     'date' => 'التاريخ',
+    'subscription_required_for_action' => 'الاشتراك النشط مطلوب للقيام بهذا الإجراء.',
+    'payment_proof_sent_grace_period' => 'تم إرسال إثبات الدفع. متجرك نشط الآن لمدة 48 ساعة (فترة سماح) حتى تتم المراجعة.',
+    'insufficient_balance' => 'الرصيد المتاح للسحب غير كافٍ.',
+    'delivery_unavailable_for_wilaya' => 'التوصيل غير متوفر حالياً لهذه الولاية.',
 ];
 
 

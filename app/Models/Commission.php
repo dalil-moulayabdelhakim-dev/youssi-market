@@ -10,6 +10,12 @@ class Commission extends Model
         'store_id',
         'order_id',
         'amount',
+        'release_at',
+        'financial_status',
+    ];
+
+    protected $casts = [
+        'release_at' => 'datetime',
     ];
 
     public function store()

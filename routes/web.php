@@ -36,6 +36,7 @@ Route::middleware([
     // Dashboard accessible only by Admin or Seller
     Route::middleware(['active', 'adminOrSeller'])->group(function () {
         Route::get('/dashboard', [AdminController::class, 'redirect'])->name('dashboard');
+        Route::get('/parameters', [OwnerController::class, 'parametersView'])->name('parameters.view');
     });
 
     // ================= Admin Routes ================= //
@@ -82,7 +83,7 @@ Route::middleware([
         Route::post('/payouts', [OwnerController::class, 'storePayoutRequest'])->name('owner-payouts.store');
 
         // Routes that require active subscription
-        Route::middleware('subscription')->group(function () {
+        Route::middleware(['subscription', 'restrictExpired'])->group(function () {
             // Product management
             Route::group([
                 'prefix' => 'p',
@@ -104,7 +105,10 @@ Route::middleware([
                 Route::get('get/cost', [OwnerController::class, 'getDeliveryCost'])->name('get-cost'); // Get delivery cost
                 Route::put('/stores/{store}/delivery', [OwnerController::class, 'updateDelivery'])->name('stores.updateDelivery'); // Update delivery settings
             });
+        });
 
+        // Orders and Categories - accessible for fulfillment even if subscription is expired (but scoped)
+        Route::middleware('subscription')->group(function () {
             // Orders management
             Route::group([
                 'prefix' => 'o',

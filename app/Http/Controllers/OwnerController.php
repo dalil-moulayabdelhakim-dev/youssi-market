@@ -300,19 +300,24 @@ class OwnerController extends Controller
         OrderItem::whereIn('id', $items->pluck('id'))
             ->update(['status' => $request->status]);
 
-        if ($request->status === 'received') {
+        if ($request->status === 'delivered') {
             $commissionRate = $store->commission_rate / 100;
-
-            $commissionAmount = $items->sum(function ($item) use ($commissionRate) {
-                $itemTotal = $item->price * $item->quantity;
-                return round($itemTotal * $commissionRate, 2); // 3% لكل item
-            });
+            
+            // Calculate platform commission and seller net earnings
+            $totalSales = $items->sum(fn($item) => $item->price * $item->quantity);
+            $commissionAmount = round($totalSales * $commissionRate, 2);
+            $netEarnings = $totalSales - $commissionAmount;
 
             Commission::create([
                 'store_id' => $storeId,
                 'order_id' => $order->id,
-                'amount' => $commissionAmount,
+                'amount' => $netEarnings,
+                'financial_status' => 'holding',
+                'release_at' => now()->addDays(7), // 7-day escrow period for COD safety
             ]);
+
+            // Increment store's holding balance
+            $store->increment('holding_balance', $netEarnings);
         }
 
         Mail::to($order->user->email)
@@ -391,6 +396,13 @@ class OwnerController extends Controller
             ->get();
 
         return view('owner.pages.payouts', compact('store', 'dueCommission', 'payoutRequests'));
+    }
+
+    public function parametersView()
+    {
+        $user = Auth::user();
+        $store = $user->store;
+        return view('owner.pages.parameters', compact('user', 'store'));
     }
 
     public function storePayoutRequest(Request $request)

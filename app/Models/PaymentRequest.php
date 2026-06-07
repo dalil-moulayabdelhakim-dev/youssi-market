@@ -10,7 +10,13 @@ class PaymentRequest extends Model
         'store_id',
         'proof_path',
         'status',
+        'transaction_reference',
+        'grace_period_ends_at',
         'subscription_method_id'
+    ];
+
+    protected $casts = [
+        'grace_period_ends_at' => 'datetime',
     ];
 
     public function store()

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\ActiveStoreScope;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
@@ -15,9 +16,16 @@ class Product extends Model
         'store_id',
         'quantity',
         'price',
+        'weight',
         'discount_price',
         'old_price',
     ];
+
+    protected static function booted(): void
+    {
+        // Apply scope globally for public frontend
+        static::addGlobalScope(new ActiveStoreScope());
+    }
 
     public function store()
     {

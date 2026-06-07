@@ -119,15 +119,49 @@ class AdminController extends Controller
                             $query->where('store_id', $storeId);
                         })->sum(DB::raw('price * quantity'));
 
+                        // 5) Trend charts (last 30 days)
+                        $orders_trend = Order::select(
+                            DB::raw('DATE(created_at) as date'),
+                            DB::raw('COUNT(*) as total')
+                        )
+                            ->whereHas('orderItems.product', function ($query) use ($storeId) {
+                                $query->where('store_id', $storeId);
+                            })
+                            ->where('created_at', '>=', now()->subDays(30))
+                            ->groupBy('date')
+                            ->orderBy('date', 'asc')
+                            ->get();
 
+                        $revenue_trend = OrderItem::select(
+                            DB::raw('DATE(order_items.created_at) as date'),
+                            DB::raw('SUM(order_items.price * order_items.quantity) as total')
+                        )
+                            ->whereHas('product', function ($query) use ($storeId) {
+                                $query->where('store_id', $storeId);
+                            })
+                            ->where('order_items.created_at', '>=', now()->subDays(30))
+                            ->groupBy('date')
+                            ->orderBy('date', 'asc')
+                            ->get();
 
+                        // 6) Top 5 products by sales
+                        $top_products = OrderItem::join('products', 'order_items.product_id', '=', 'products.id')
+                            ->select('products.title', DB::raw('SUM(order_items.quantity) as total_sold'))
+                            ->where('products.store_id', $storeId)
+                            ->groupBy('products.id', 'products.title')
+                            ->orderBy('total_sold', 'desc')
+                            ->take(5)
+                            ->get();
 
                         return view('owner.index', [
-                        'orders_number' => $orders_number,
-                        'products_number' => $products_number,
-                        'customers_number' => $customers_number,
-                        'revenue' => $revenue,
-                        'cartCount' => $cartCount,
+                            'orders_number' => $orders_number,
+                            'products_number' => $products_number,
+                            'customers_number' => $customers_number,
+                            'revenue' => $revenue,
+                            'cartCount' => $cartCount,
+                            'orders_trend' => $orders_trend,
+                            'revenue_trend' => $revenue_trend,
+                            'top_products' => $top_products,
                         ]);
                     })(),
 
@@ -199,16 +233,27 @@ class AdminController extends Controller
     {
         $paymentRequest = PaymentRequest::findOrFail($request->request_id);
         $store = $paymentRequest->store;
+        $subMethod = $paymentRequest->subscription_method;
 
-        // تحديث حالة الطلب
-        $paymentRequest->status = 'approved';
-        $paymentRequest->save();
+        \Illuminate\Support\Facades\DB::transaction(function () use ($paymentRequest, $store, $subMethod) {
+            // تحديث حالة الطلب
+            $paymentRequest->status = 'approved';
+            $paymentRequest->save();
 
-        // تحديث المتجر
-        $duration = $store->subscription_method_id == 1 ? '1 mounth' : '1 year'; // حسب الخطة
-        $store->subscription_status = 'active';
-        $store->subscription_ends_at = now()->add($duration);
-        $store->save();
+            // تحديث المتجر
+            // Use duration_months from subscription method or default
+            $months = $subMethod->duration_months ?? ($subMethod->name === 'monthly' ? 1 : 12);
+            
+            $store->subscription_status = 'active';
+            
+            // If already active, extend. Otherwise, start from now.
+            $startFrom = ($store->subscription_ends_at && $store->subscription_ends_at->isFuture()) 
+                ? $store->subscription_ends_at 
+                : now();
+
+            $store->subscription_ends_at = $startFrom->addMonths($months);
+            $store->save();
+        });
 
         Session::flash('success', [__('messages.approved_success')]);
         return back();
@@ -217,8 +262,20 @@ class AdminController extends Controller
     public function reject(Request $request)
     {
         $paymentRequest = PaymentRequest::findOrFail($request->request_id);
-        $paymentRequest->status = 'rejected';
-        $paymentRequest->save();
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($paymentRequest) {
+            $paymentRequest->status = 'rejected';
+            $paymentRequest->save();
+
+            // Revoke grace period if currently active on grace
+            $store = $paymentRequest->store;
+            if ($paymentRequest->grace_period_ends_at && $store->subscription_ends_at && $store->subscription_ends_at->equalTo($paymentRequest->grace_period_ends_at)) {
+                $store->update([
+                    'subscription_status' => 'expired',
+                    'subscription_ends_at' => now(),
+                ]);
+            }
+        });
 
         return back()->with('error', __('messages.rejected_success'));
     }
@@ -446,11 +503,23 @@ class AdminController extends Controller
             'admin_notes' => 'nullable|string',
         ]);
 
+        $store = $payout->store;
+
         if ($request->action === 'approve') {
-            $payout->update([
-                'status' => 'approved',
-                'admin_notes' => $request->admin_notes,
-            ]);
+            if ($store->withdrawable_balance < $payout->amount) {
+                return back()->with('error', [__('messages.insufficient_balance')]);
+            }
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($payout, $store, $request) {
+                $payout->update([
+                    'status' => 'approved',
+                    'admin_notes' => $request->admin_notes,
+                ]);
+
+                // Deduct from withdrawable balance
+                $store->decrement('withdrawable_balance', $payout->amount);
+            });
+
             Session::flash('success', [__('messages.payout_approved')]);
         } else {
             $payout->update([
