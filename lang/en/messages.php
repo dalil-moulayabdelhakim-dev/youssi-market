@@ -24,6 +24,7 @@ return [
     'address' => 'Address',
     'phone' => 'Phone',
     'amount'=> 'Amount',
+    'delete'=> 'Delete',
     'email' => 'Email',
     'useful_links' => 'Useful Links',
     'about_us' => 'About Us',

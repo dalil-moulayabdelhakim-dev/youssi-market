@@ -16,6 +16,7 @@ return [
     'profile' => 'الملف الشخصي',
     'dashboard' => 'لوحة التحكم',
     'logout' => 'تسجيل الخروج',
+    'delete' => 'حذف',
     'all_departments' => 'جميع الأقسام',
     'all_categories' => 'جميع الفئات',
     'search_placeholder' => 'ما الذي تحتاجه؟',
